@@ -4,6 +4,14 @@
 
 **Doanh nghiệp:** GUMAC/TDA — thời trang nữ Việt Nam · 50 cửa hàng · 5 kênh phân phối · dữ liệu 10 năm (2015–2025)
 
+## 🔗 Live Demo
+
+| Link | Mô tả |
+|---|---|
+| [📊 Power BI Dashboard](https://app.powerbi.com/view?r=eyJrIjoiZDk5YTNkNjgtMjcyNC00NGU2LTg5MWItYTFmMmRhOTM0ODdkIiwidCI6IjZhYzJhZDA2LTY5MmMtNDY2My1iN2FmLWE5ZmYyYTg2NmQwYyIsImMiOjEwfQ%3D%3D) | Dashboard 5 trang: Revenue, Sales, Product, Customer RFM, Store & AM |
+| [🎯 Project Pitch](https://project-da-business-performance.vercel.app/) | 8-slide giới thiệu dự án — kiến trúc, star schema, key insights |
+| [📝 Báo cáo phân tích](https://project-da-business-performance.vercel.app/report/) | Phân tích chuyên sâu — nguyên nhân gốc rễ, RFM, khuyến nghị hành động |
+
 ---
 
 ## Tổng quan dự án
