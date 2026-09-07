@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Báo Cáo Phân Tích Chuyên Sâu — EDW Tech | GUMAC/TDA</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --accent:#1D4ED8;--accent2:#0891B2;--green:#059669;--red:#DC2626;
+  --yellow:#D97706;--purple:#7C3AED;--orange:#EA580C;
+  --bg:#F8FAFC;--surface:#FFFFFF;--border:#E2E8F0;--border2:#CBD5E1;
+  --text:#0F172A;--muted:#64748B;--sub:#94A3B8;
+}
+body{font-family:'Segoe UI',Georgia,system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.8;font-size:15.5px}
+a{color:var(--accent);text-decoration:none}
+
+/* site nav */
+.site-nav{position:fixed;top:0;left:0;right:0;height:44px;background:rgba(255,255,255,.95);border-bottom:1px solid var(--border);backdrop-filter:blur(10px);display:flex;align-items:center;padding:0 28px;gap:6px;z-index:300}
+.site-nav .brand{font-size:12px;font-weight:800;color:var(--accent);margin-right:12px}
+.site-nav a{font-size:12.5px;padding:4px 13px;border-radius:20px;color:var(--muted);text-decoration:none;transition:.2s;font-weight:500}
+.site-nav a:hover{color:var(--text);background:#F1F5F9}
+.site-nav a.active{background:#EFF6FF;color:var(--accent);border:1px solid #BFDBFE}
+
+.page{max-width:780px;margin:0 auto;padding:78px 32px 100px}
+
+/* HEADER */
+.report-header{border-bottom:3px solid var(--accent);padding-bottom:32px;margin-bottom:48px}
+.report-header .category{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:12px}
+.report-header h1{font-size:2rem;font-weight:800;line-height:1.25;color:var(--text);margin-bottom:14px}
+.report-header .subtitle{color:var(--muted);font-size:14px;margin-bottom:20px;line-height:1.7}
+.meta-row{display:flex;flex-wrap:wrap;gap:18px;font-size:12.5px;color:var(--muted);border-top:1px solid var(--border);padding-top:16px;margin-top:8px}
+.meta-row span strong{color:var(--text)}
+
+/* TOC */
+.toc-box{background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:8px;padding:22px 26px;margin-bottom:48px}
+.toc-box h3{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;font-weight:700}
+.toc-box ol{padding-left:18px;display:flex;flex-direction:column;gap:6px}
+.toc-box li{font-size:13.5px}
+.toc-box li a{color:var(--text);font-weight:500}
+.toc-box li a:hover{color:var(--accent)}
+
+/* EXEC FINDINGS */
+.exec-findings{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin:24px 0}
+.finding-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px 16px;position:relative;overflow:hidden}
+.finding-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.finding-card.red::before{background:var(--red)}
+.finding-card.green::before{background:var(--green)}
+.finding-card.yellow::before{background:var(--yellow)}
+.finding-card .f-num{font-size:20px;font-weight:800;margin-bottom:4px}
+.finding-card .f-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.finding-card .f-desc{font-size:12px;color:var(--muted);line-height:1.55}
+.finding-card.red .f-num{color:var(--red)}
+.finding-card.green .f-num{color:var(--green)}
+.finding-card.yellow .f-num{color:var(--yellow)}
+
+/* SECTIONS */
+.section{margin-bottom:56px}
+.section-header{display:flex;align-items:center;gap:12px;margin-bottom:24px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.section-num{background:var(--accent);color:#fff;border-radius:6px;padding:3px 10px;font-size:12px;font-weight:700;flex-shrink:0}
+.section-header h2{font-size:1.25rem;font-weight:700;color:var(--text)}
+h3{font-size:1rem;font-weight:700;color:var(--text);margin:28px 0 12px}
+p{margin-bottom:16px;color:#1E293B}
+
+/* CALLOUTS */
+.callout{border-left:4px solid;border-radius:0 8px 8px 0;padding:14px 18px;margin:20px 0;background:var(--surface)}
+.callout.insight{border-color:var(--accent);background:#EFF6FF}
+.callout.warning{border-color:var(--yellow);background:#FFFBEB}
+.callout.danger{border-color:var(--red);background:#FEF2F2}
+.callout.success{border-color:var(--green);background:#F0FDF4}
+.callout strong{display:block;font-size:11px;letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px}
+.callout.insight strong{color:var(--accent)}
+.callout.warning strong{color:var(--yellow)}
+.callout.danger strong{color:var(--red)}
+.callout.success strong{color:var(--green)}
+.callout p{margin:0;font-size:13.5px;color:#374151;line-height:1.65}
+
+/* DATA TABLE */
+.data-table{width:100%;border-collapse:collapse;font-size:13px;margin:16px 0 24px;background:var(--surface);border-radius:8px;overflow:hidden;border:1px solid var(--border)}
+.data-table thead{background:#F1F5F9}
+.data-table th{padding:10px 14px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700;border-bottom:1px solid var(--border2)}
+.data-table td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:middle}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:#F8FAFC}
+.tag{display:inline-block;border-radius:4px;padding:1px 7px;font-size:11px;font-weight:600}
+.tag.green{background:#DCFCE7;color:#166534}
+.tag.red{background:#FEE2E2;color:#991B1B}
+.tag.yellow{background:#FEF9C3;color:#854D0E}
+.tag.blue{background:#DBEAFE;color:#1E40AF}
+.tag.purple{background:#EDE9FE;color:#5B21B6}
+.tag.gray{background:#F1F5F9;color:#475569}
+
+/* METRIC BLOCKS */
+.metric-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0 24px}
+.metric{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px 14px;text-align:center}
+.metric .val{font-size:22px;font-weight:800;color:var(--accent);margin-bottom:3px}
+.metric .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.metric .delta{font-size:11px;margin-top:4px}
+.metric .delta.up{color:var(--green)}
+.metric .delta.down{color:var(--red)}
+
+/* RCA TABLE */
+.rca-grid{border:1px solid var(--border);border-radius:10px;overflow:hidden;margin:16px 0 24px;background:var(--surface)}
+.rca-row{display:grid;grid-template-columns:160px 1fr 1fr;border-bottom:1px solid var(--border)}
+.rca-row:last-child{border-bottom:none}
+.rca-row.header{background:#F1F5F9;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700}
+.rca-cell{padding:11px 14px;font-size:13px;border-right:1px solid var(--border)}
+.rca-cell:last-child{border-right:none}
+
+/* RECOMMENDATION */
+.rec-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px 20px;margin-bottom:16px;display:grid;grid-template-columns:auto 1fr;gap:16px}
+.rec-badge{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;flex-shrink:0;margin-top:2px}
+.rec-badge.p1{background:#FEE2E2;color:var(--red)}
+.rec-badge.p2{background:#FEF9C3;color:var(--yellow)}
+.rec-badge.p3{background:#DBEAFE;color:var(--accent)}
+.rec-title{font-weight:700;font-size:14.5px;margin-bottom:6px}
+.rec-body{font-size:13.5px;color:#374151;line-height:1.65}
+.rec-meta{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap}
+.rec-tag{font-size:11px;background:#F1F5F9;border:1px solid var(--border2);border-radius:4px;padding:2px 8px;color:var(--muted)}
+
+/* INSIGHT BOX */
+.insight-box{background:linear-gradient(135deg,#EFF6FF,#F0F9FF);border:1px solid #BFDBFE;border-radius:10px;padding:20px 22px;margin:20px 0}
+.insight-box .ib-title{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+.insight-box ul{padding-left:18px;display:flex;flex-direction:column;gap:8px}
+.insight-box li{font-size:13.5px;color:#1E3A8A;line-height:1.6}
+
+/* CONCLUSION */
+.conclusion-box{background:linear-gradient(135deg,#1E3A8A,#1D4ED8);border-radius:12px;padding:28px 30px;color:#fff;margin-top:48px}
+.conclusion-box h2{font-size:1.15rem;font-weight:800;margin-bottom:12px}
+.conclusion-box p{color:rgba(255,255,255,.85);font-size:14px;margin-bottom:0;line-height:1.7}
+
+/* FOOTER */
+.report-footer{border-top:1px solid var(--border);margin-top:56px;padding-top:20px;font-size:12px;color:var(--sub);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+
+@media(max-width:600px){
+  .page{padding:28px 16px 60px}
+  .exec-findings,.metric-grid{grid-template-columns:1fr}
+  .rca-row{grid-template-columns:1fr}
+  .rec-item{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <span class="brand">EDW Tech · GUMAC/TDA</span>
+  <a href="../pitch/index.html">Pitch Deck</a>
+  <a href="index.html" class="active">Báo cáo phân tích</a>
+</nav>
+
+<div class="page">
+
+<!-- HEADER -->
+<header class="report-header">
+  <div class="category">Báo Cáo Phân Tích Chuyên Sâu · EDW Tech Project</div>
+  <h1>Doanh Nghiệp Thời Trang Đa Kênh</h1>
+  <div class="subtitle">Từ 9.4 GB dữ liệu thô của GUMAC/TDA, bài phân tích này đi qua từng lớp: doanh thu, kênh bán, hành vi khách hàng, hiệu suất cửa hàng. Mục tiêu không dừng lại ở việc mô tả số liệu, mà là tìm ra nguyên nhân và đề xuất hành động có thể thực thi ngay.</div>
+  <div class="meta-row">
+    <span><strong>Doanh nghiệp:</strong> GUMAC / TDA (Thời trang Việt Nam)</span>
+    <span><strong>Phạm vi:</strong> 5 kênh · 50 cửa hàng</span>
+    <span><strong>Tác giả:</strong> Quí · Data Engineering Portfolio 2025</span>
+  </div>
+</header>
+
+<!-- MỤC LỤC -->
+<div class="toc-box">
+  <h3>Mục lục</h3>
+  <ol>
+    <li><a href="#exec">Tóm tắt điều hành</a></li>
+    <li><a href="#revenue">Doanh thu và khoảng cách mục tiêu</a></li>
+    <li><a href="#channel">Lợi nhuận thực sự theo từng kênh bán</a></li>
+    <li><a href="#customer">Câu chuyện phía sau khách hàng</a></li>
+    <li><a href="#store">Cửa hàng và người quản lý</a></li>
+    <li><a href="#rca">Tìm gốc rễ của vấn đề</a></li>
+    <li><a href="#rec">Khuyến nghị hành động</a></li>
+    <li><a href="#conclusion">Kết luận</a></li>
+  </ol>
+</div>
+
+<!-- 0. EXECUTIVE SUMMARY -->
+<div class="section" id="exec">
+  <div class="section-header">
+    <span class="section-num">Tóm tắt</span>
+    <h2>Ba điều quan trọng nhất cần biết</h2>
+  </div>
+
+  <p>GUMAC/TDA bán thời trang qua 5 kênh và vận hành 50 cửa hàng trên toàn quốc. Nhìn từ ngoài vào, đây là một doanh nghiệp đang tăng trưởng. Nhìn vào dữ liệu, bức tranh phức tạp hơn nhiều.</p>
+
+  <div class="exec-findings">
+    <div class="finding-card red">
+      <div class="f-label">Dữ liệu không đồng nhất</div>
+      <div class="f-num">Tiki</div>
+      <div class="f-desc">Phí nền tảng của Tiki được ghi nhận âm trong toàn bộ dữ liệu nguồn, trong khi các kênh khác ghi dương. Nếu không phát hiện, mọi so sánh chi phí giữa các kênh đều sai.</div>
+    </div>
+    <div class="finding-card yellow">
+      <div class="f-label">Khách hàng đang rời đi</div>
+      <div class="f-num">Nhóm At Risk</div>
+      <div class="f-desc">Một phần đáng kể khách hàng từng mua nhiều lần đã ngừng mua, nhưng chưa có cơ chế nào phát hiện và phản ứng kịp thời trước khi họ thực sự rời bỏ.</div>
+    </div>
+    <div class="finding-card green">
+      <div class="f-label">Cơ hội bị bỏ ngỏ</div>
+      <div class="f-num">TikTok Shop</div>
+      <div class="f-desc">Kênh có chi phí nền tảng thấp nhất, tệp khách hàng trẻ và đang tăng trưởng nhanh, nhưng chưa được đầu tư tương xứng so với tiềm năng thực sự.</div>
+    </div>
+  </div>
+
+  <div class="callout insight">
+    <strong>Luận điểm chủ đạo</strong>
+    <p>GUMAC/TDA có đủ dữ liệu để đưa ra quyết định tốt hơn. Vấn đề không phải thiếu số liệu, mà là ba điểm mù đang tồn tại song song: chi phí kênh không được theo dõi chính xác, khách hàng rời bỏ không được phát hiện sớm, và hiệu suất giữa các cửa hàng chênh lệch lớn nhưng chưa có giải thích rõ ràng.</p>
+  </div>
+</div>
+
+<!-- 1. REVENUE -->
+<div class="section" id="revenue">
+  <div class="section-header">
+    <span class="section-num">01</span>
+    <h2>Doanh thu và khoảng cách mục tiêu</h2>
+  </div>
+
+  <p>Câu hỏi đơn giản nhất trong kinh doanh bán lẻ là: chúng ta có đạt mục tiêu không? Nhưng câu trả lời lại không đơn giản chút nào khi có 5 kênh, 50 cửa hàng, và mục tiêu được giao theo tháng trong khi doanh thu thực tế biến động theo ngày.</p>
+
+  <h3>Khi nào thì khoảng cách mục tiêu là vấn đề, khi nào thì không?</h3>
+
+  <p>Một cửa hàng vừa khai trương 2 tháng mà chưa đạt 80% target là chuyện bình thường. Một cửa hàng hoạt động 3 năm mà liên tục miss target 4 tháng liên tiếp thì là tín hiệu cần điều tra. Hai trường hợp này đều "dưới mục tiêu" trên dashboard, nhưng bản chất hoàn toàn khác nhau và cần phản ứng khác nhau.</p>
+
+  <p>Phân tích dữ liệu doanh thu cần phân biệt rõ hai nguồn gốc của khoảng cách: năng lực thực thi thực sự có vấn đề, hay mục tiêu được đặt ra không sát với thực tế của từng cửa hàng và từng thời điểm?</p>
+
+  <h3>Yếu tố mùa vụ trong ngành thời trang</h3>
+
+  <p>Thời trang bán lẻ Việt Nam có nhịp doanh thu rất rõ. Tháng 1 và tháng 2 là đỉnh cao nhất trong năm nhờ Tết Nguyên Đán. Tháng 11 và tháng 12 tăng mạnh theo nhịp 11.11 và 12.12. Từ tháng 3 đến tháng 5 thường là đáy mùa. Nếu target được giao đồng đều mỗi tháng mà không tính đến yếu tố mùa vụ, kết quả phân tích sẽ cho thấy quý 2 "kém" và quý 4 "giỏi" trong khi thực ra cả hai đều đang đúng với quy luật thị trường.</p>
+
+  <div class="callout warning">
+    <strong>Điểm cần kiểm tra trong dữ liệu</strong>
+    <p>Cửa hàng nào miss target 3 tháng liên tiếp? Trong số đó, bao nhiêu cửa hàng mới khai trương dưới 6 tháng? Bao nhiêu cửa hàng đã hoạt động trên 1 năm? Chỉ nhóm thứ hai mới thực sự cần điều tra sâu hơn.</p>
+  </div>
+
+  <h3>GMV không phải doanh thu thực sự</h3>
+
+  <p>Con số GMV (Gross Merchandise Value) trông đẹp trên báo cáo, nhưng nó chưa trừ phí nền tảng, hoàn trả, chiết khấu. Doanh thu thực tế mà doanh nghiệp nhận về là Net Revenue, và khoảng cách giữa GMV và Net Revenue có thể lớn hơn nhiều người nghĩ, đặc biệt ở các kênh có phí platform cao hoặc tỉ lệ hoàn trả lớn.</p>
+</div>
+
+<!-- 2. CHANNEL -->
+<div class="section" id="channel">
+  <div class="section-header">
+    <span class="section-num">02</span>
+    <h2>Lợi nhuận thực sự theo từng kênh bán</h2>
+  </div>
+
+  <p>Có 5 kênh phân phối. Nhìn vào doanh thu, Shopee dẫn đầu rõ ràng. Nhưng doanh thu không phải là câu chuyện đầy đủ. Câu hỏi thực sự là: sau khi trừ hết chi phí nền tảng, chi phí vận hành, và hoàn trả, mỗi kênh còn lại bao nhiêu?</p>
+
+  <h3>Phát hiện bất thường: phí Tiki ghi âm</h3>
+
+  <p>Khi phân tích dữ liệu phí nền tảng, một điểm bất thường được phát hiện ngay lập tức: toàn bộ 25.062 dòng giao dịch Tiki đều có phí ghi âm, với tổng cộng hơn 463 triệu đồng phí bị ghi ngược dấu. Shopee và Lazada ghi dương. Tiki ghi âm. Đây không phải Tiki miễn phí cho seller, mà là sự không nhất quán trong quy trình xuất dữ liệu giữa các platform.</p>
+
+  <p>Nếu không phát hiện và xử lý, mọi báo cáo so sánh chi phí giữa các kênh sẽ cho ra kết quả sai hoàn toàn: Tiki trông như đang "trả tiền" cho seller thay vì thu phí. Đây là loại lỗi dữ liệu nguy hiểm nhất vì nó không làm hỏng dashboard mà làm sai toàn bộ kết luận rút ra từ dashboard đó.</p>
+
+  <div class="callout danger">
+    <strong>Bài học từ lỗi này</strong>
+    <p>Không nên tin tưởng vào một con số chỉ vì nó xuất hiện trong hệ thống. Dữ liệu từ các nguồn bên ngoài (API của platform thương mại điện tử) cần được kiểm tra tính nhất quán trước khi đưa vào phân tích. Phát hiện sớm tốt hơn nhiều so với xây dựng chiến lược dựa trên số liệu sai.</p>
+  </div>
+
+  <h3>Bức tranh chi phí giữa các kênh</h3>
+
+  <table class="data-table">
+    <thead><tr><th>Kênh</th><th>Mức phí nền tảng</th><th>Đặc điểm</th><th>Đánh giá</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>TikTok Shop</strong></td>
+        <td>1 đến 3%</td>
+        <td>Phí thấp nhất, đang ưu đãi để thu hút seller</td>
+        <td><span class="tag green">Tiềm năng cao</span></td>
+      </tr>
+      <tr>
+        <td><strong>Lazada</strong></td>
+        <td>4 đến 6%</td>
+        <td>Phí hợp lý, volume đang có xu hướng giảm</td>
+        <td><span class="tag blue">Duy trì</span></td>
+      </tr>
+      <tr>
+        <td><strong>Shopee</strong></td>
+        <td>5 đến 8%</td>
+        <td>Phí cao nhưng volume đủ bù đắp</td>
+        <td><span class="tag blue">Kênh chủ lực</span></td>
+      </tr>
+      <tr>
+        <td><strong>Tiki</strong></td>
+        <td>6 đến 10%</td>
+        <td>Phí cao, volume thấp nhất trong 4 kênh online</td>
+        <td><span class="tag red">Cần đánh giá lại</span></td>
+      </tr>
+      <tr>
+        <td><strong>Offline</strong></td>
+        <td>Không có phí %</td>
+        <td>Chi phí cố định cao (thuê mặt bằng, nhân sự)</td>
+        <td><span class="tag purple">Trụ cột thương hiệu</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout insight">
+    <strong>Góc nhìn chiến lược</strong>
+    <p>Một kênh có GMV cao chưa chắc đang đóng góp tốt cho lợi nhuận. TikTok Shop hiện có volume nhỏ hơn Shopee nhưng chi phí nền tảng thấp hơn đáng kể. Nếu đầu tư đúng vào content và vận hành, đây có thể là kênh có margin tốt nhất trong 1 đến 2 năm tới.</p>
+  </div>
+</div>
+
+<!-- 3. CUSTOMER RFM -->
+<div class="section" id="customer">
+  <div class="section-header">
+    <span class="section-num">03</span>
+    <h2>Câu chuyện phía sau khách hàng</h2>
+  </div>
+
+  <p>Dữ liệu giao dịch khi được nhìn từ góc độ khách hàng sẽ kể một câu chuyện hoàn toàn khác. Không phải mọi khách hàng đều có giá trị như nhau, và cũng không phải mọi sự sụt giảm doanh thu đều đến từ việc không có khách mới. Đôi khi vấn đề nằm ở việc khách hàng cũ đang lặng lẽ rời đi mà không ai chú ý.</p>
+
+  <h3>Ba chiều để hiểu một khách hàng</h3>
+
+  <p>Mô hình RFM phân tích hành vi mua hàng theo ba chiều: họ mua gần đây không (Recency), họ mua bao nhiêu lần (Frequency), và họ đã chi bao nhiêu (Monetary). Ba chiều này kết hợp lại cho phép phân loại toàn bộ tệp khách hàng thành các nhóm có đặc điểm và nhu cầu rất khác nhau.</p>
+
+  <table class="data-table">
+    <thead><tr><th>Nhóm</th><th>Hành vi</th><th>Câu chuyện thực tế</th><th>Cần làm gì</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>Champion</strong></td>
+        <td>Mua gần, mua nhiều, chi nhiều</td>
+        <td>Người hâm mộ thương hiệu. Họ quay lại không cần khuyến mãi.</td>
+        <td><span class="tag green">Giữ và trân trọng</span></td>
+      </tr>
+      <tr>
+        <td><strong>Loyal</strong></td>
+        <td>Mua đều, chi vừa</td>
+        <td>Khách hàng ổn định. Có thể trở thành Champion nếu được kích hoạt đúng lúc.</td>
+        <td><span class="tag green">Nâng hạng</span></td>
+      </tr>
+      <tr>
+        <td><strong>New Customer</strong></td>
+        <td>Mới mua lần đầu</td>
+        <td>Còn đang quan sát và đánh giá thương hiệu. Lần mua thứ hai là cột mốc quan trọng nhất.</td>
+        <td><span class="tag blue">Nuôi dưỡng</span></td>
+      </tr>
+      <tr>
+        <td><strong>Potential Loyalist</strong></td>
+        <td>Mới nhưng đã mua nhiều</td>
+        <td>Có tiềm năng, cần được chào đón đúng cách trước khi họ đi tìm thương hiệu khác.</td>
+        <td><span class="tag blue">Kích hoạt</span></td>
+      </tr>
+      <tr>
+        <td><strong>At Risk</strong></td>
+        <td>Từng mua nhiều, đang im lặng</td>
+        <td>Đây là nhóm nguy hiểm nhất. Họ đã gắn bó nhưng đang dần rời xa. Còn cơ hội nếu hành động sớm.</td>
+        <td><span class="tag red">Khẩn cấp</span></td>
+      </tr>
+      <tr>
+        <td><strong>Lost Champion</strong></td>
+        <td>Từng là khách VIP, giờ biến mất</td>
+        <td>Một khách hàng quan trọng đã rời đi vì lý do nào đó. Đáng để hỏi thẳng tại sao.</td>
+        <td><span class="tag red">Cứu vãn</span></td>
+      </tr>
+      <tr>
+        <td><strong>Lost</strong></td>
+        <td>Ít mua, lâu rồi không quay lại</td>
+        <td>Chi phí để kéo họ trở lại thường cao hơn giá trị họ mang lại. Nên buông.</td>
+        <td><span class="tag gray">Để tự nhiên</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout warning">
+    <strong>Vấn đề phát hiện từ dữ liệu</strong>
+    <p>Nhóm At Risk và Lost Champion là những khách hàng đã từng có tần suất mua cao nhưng đã ngừng. Nếu tỉ lệ hai nhóm này chiếm trên 35% tổng tệp khách hàng, doanh nghiệp đang trong vòng xoay nguy hiểm: chi tiền để có khách mới trong khi không giữ được khách cũ, khiến tăng trưởng trông có vẻ tốt nhưng nền tảng ngày càng mong manh.</p>
+  </div>
+
+  <h3>Khi phân tích gặp giới hạn dữ liệu</h3>
+
+  <p>Một điều thực tế đã được phát hiện khi xây dựng dashboard: cột tỉnh thành trong dữ liệu cửa hàng không có thông tin. Điều này có nghĩa là không thể vẽ bản đồ phân bổ khách hàng theo tỉnh thành như ban đầu dự kiến. Giải pháp là dùng vùng miền (Bắc, Trung, Nam) làm đơn vị phân tích thay thế. Đây không phải thất bại của phân tích, mà là bài học thực tế: dữ liệu thực tế luôn không hoàn hảo và người phân tích cần biết điều chỉnh linh hoạt.</p>
+</div>
+
+<!-- 4. STORE & AM -->
+<div class="section" id="store">
+  <div class="section-header">
+    <span class="section-num">04</span>
+    <h2>Cửa hàng và người quản lý</h2>
+  </div>
+
+  <p>Năm mươi cửa hàng trải dài trên nhiều tỉnh thành. Một số thuộc sở hữu trực tiếp của công ty, một số là nhượng quyền. Cùng thương hiệu, cùng sản phẩm, nhưng kết quả kinh doanh giữa các cửa hàng có thể chênh nhau rất lớn.</p>
+
+  <div class="metric-grid">
+    <div class="metric">
+      <div class="val">50</div>
+      <div class="lbl">Tổng số cửa hàng</div>
+    </div>
+    <div class="metric">
+      <div class="val">42</div>
+      <div class="lbl">Trực tiếp sở hữu</div>
+      <div class="delta up">84% tổng chuỗi</div>
+    </div>
+    <div class="metric">
+      <div class="val">8</div>
+      <div class="lbl">Nhượng quyền</div>
+      <div class="delta">16% tổng chuỗi</div>
+    </div>
+  </div>
+
+  <h3>Hai mô hình, hai bộ rủi ro khác nhau</h3>
+
+  <p>Cửa hàng trực tiếp sở hữu mang lại kiểm soát hoàn toàn về chất lượng, nhân sự và trải nghiệm khách hàng. Nhưng chi phí cố định cao, và mọi cửa hàng yếu kém đều ảnh hưởng trực tiếp đến lợi nhuận công ty. Cửa hàng nhượng quyền giảm gánh nặng vốn, nhưng chất lượng vận hành phụ thuộc vào năng lực của đối tác, và dữ liệu từ các cửa hàng này đôi khi không đầy đủ hoặc không đồng nhất với hệ thống trung tâm.</p>
+
+  <p>Câu hỏi quan trọng là: khi so sánh doanh thu bình quân trên mỗi cửa hàng giữa hai mô hình, bên nào hiệu quả hơn? Câu trả lời sẽ định hướng chiến lược mở rộng trong các năm tới.</p>
+
+  <h3>Account Manager là yếu tố ẩn</h3>
+
+  <p>Mỗi Account Manager phụ trách một tập hợp cửa hàng hoặc kênh. Trên dashboard, hiệu suất cửa hàng thường được nhìn độc lập. Nhưng khi nhóm các cửa hàng theo AM phụ trách, một câu hỏi thú vị xuất hiện: cửa hàng của AM này liên tục vượt target trong khi cửa hàng của AM kia liên tục dưới target, ngay cả khi hai nhóm cửa hàng có vị trí và tiềm năng tương tự nhau.</p>
+
+  <div class="callout insight">
+    <strong>Nguyên tắc so sánh công bằng</strong>
+    <p>Không nên so sánh AM quản lý cửa hàng flagship ở trung tâm thành phố với AM quản lý cửa hàng nhỏ ở tỉnh theo doanh thu tuyệt đối. Chỉ số công bằng hơn là tỉ lệ hoàn thành mục tiêu, và nên so sánh trong nhóm cửa hàng có tiềm năng tương đương.</p>
+  </div>
+</div>
+
+<!-- 5. ROOT CAUSE ANALYSIS -->
+<div class="section" id="rca">
+  <div class="section-header">
+    <span class="section-num">05</span>
+    <h2>Tìm gốc rễ của vấn đề</h2>
+  </div>
+
+  <p>Triệu chứng trên báo cáo thường chỉ là phần nổi của tảng băng. Ba vấn đề lớn nhất được xác định từ quá trình phân tích dữ liệu, cùng chuỗi nguyên nhân dẫn đến chúng.</p>
+
+  <h3>Vấn đề 1: Dữ liệu không đồng nhất giữa các kênh</h3>
+
+  <div class="rca-grid">
+    <div class="rca-row header">
+      <div class="rca-cell">Tầng phân tích</div>
+      <div class="rca-cell">Nội dung</div>
+      <div class="rca-cell">Bằng chứng</div>
+    </div>
+    <div class="rca-row">
+      <div class="rca-cell"><strong>Biểu hiện</strong></div>
+      <div class="rca-cell">Phí nền tảng Tiki hiển thị âm trên báo cáo</div>
+      <div class="rca-cell">Toàn bộ 25.062 giao dịch Tiki có phí nhỏ hơn hoặc bằng 0</div>
+    </div>
+    <div class="rca-row">
+      <div class="rca-cell"><strong>Nguyên nhân 1</strong></div>
+      <div class="rca-cell">Tiki xuất dữ liệu theo quy ước âm (ghi nợ), khác với Shopee và Lazada</div>
+      <div class="rca-cell">Convention khác nhau không được ghi chép</div>
+    </div>
+    <div class="rca-row">
+      <div class="rca-cell"><strong>Nguyên nhân 2</strong></div>
+      <div class="rca-cell">Quy trình nhập dữ liệu không chuẩn hoá trước khi đưa vào kho</div>
+      <div class="rca-cell">Không có bước kiểm tra dấu số trong pipeline</div>
+    </div>
+    <div class="rca-row">
+      <div class="rca-cell"><strong>Gốc rễ</strong></div>
+      <div class="rca-cell">Thiếu thoả thuận về định dạng dữ liệu với từng nền tảng, không có kiểm tra tự động</div>
+      <div class="rca-cell">Lỗi chỉ được phát hiện khi làm dashboard</div>
+    </div>
+  </div>
+
+  <h3>Vấn đề 2: Khách hàng rời bỏ không được phát hiện sớm</h3>
+
+  <div class="rca-grid">
+    <div class="rca-row header">
+      <div class="rca-cell">Tầng phân tích</div>
+      <div class="rca-cell">Nội dung</div>
+      <div class="rca-cell">Hệ quả</div>
+    </div>
+    <div class="rca-row">
+      <div class="rca-cell"><strong>Biểu hiện</strong></div>
+      <div class="rca-cell">Nhóm At Risk và Lost Champion tồn tại trong dữ liệu nhưng chưa có phản ứng nào</div>
+      <div class="rca-cell">Khách hàng giá trị cao đang âm thầm rời đi</div>
+    </div>
+    <div class="rca-row">
+      <div class="rca-cell"><strong>Nguyên nhân 1</strong></div>
+      <div class="rca-cell">Không có cơ chế cảnh báo khi khách hàng không mua trong 60 đến 90 ngày</div>
+      <div class="rca-cell">Churn diễn ra âm thầm, không ai biết</div>
+    </div>
+    <div class="rca-row">
+      <div class="rca-cell"><strong>Nguyên nhân 2</strong></div>
+      <div class="rca-cell">Phân khúc khách hàng chỉ được xem theo báo cáo định kỳ, không có hành động tự động</div>
+      <div class="rca-cell">Insight có nhưng không được chuyển thành action</div>
+    </div>
+    <div class="rca-row">
+      <div class="rca-cell"><strong>Gốc rễ</strong></div>
+      <div class="rca-cell">Vòng lặp Dữ liệu đến Insight đến Hành động bị đứt tại bước cuối</div>
+      <div class="rca-cell">Dashboard để quan sát, không phải để hành động</div>
+    </div>
+  </div>
+
+  <h3>Vấn đề 3: Hiệu suất cửa hàng chênh lệch lớn, thiếu giải thích</h3>
+
+  <div class="rca-grid">
+    <div class="rca-row header">
+      <div class="rca-cell">Tầng phân tích</div>
+      <div class="rca-cell">Nội dung</div>
+      <div class="rca-cell">Hệ quả</div>
+    </div>
+    <div class="rca-row">
+      <div class="rca-cell"><strong>Biểu hiện</strong></div>
+      <div class="rca-cell">Khoảng cách doanh thu giữa cửa hàng tốt nhất và kém nhất rất lớn</div>
+      <div class="rca-cell">Không rõ đâu là do năng lực, đâu là do location hoặc tuổi cửa hàng</div>
+    </div>
+    <div class="rca-row">
+      <div class="rca-cell"><strong>Nguyên nhân</strong></div>
+      <div class="rca-cell">Mục tiêu giao cho cửa hàng không phân biệt cửa hàng mới hay đã trưởng thành</div>
+      <div class="rca-cell">Benchmark không công bằng, khó xác định cửa hàng thực sự yếu kém</div>
+    </div>
+    <div class="rca-row">
+      <div class="rca-cell"><strong>Gốc rễ</strong></div>
+      <div class="rca-cell">Thiếu phân tầng cửa hàng theo độ trưởng thành và tiềm năng vị trí</div>
+      <div class="rca-cell">Quản lý ra quyết định thiếu thông tin đầy đủ</div>
+    </div>
+  </div>
+</div>
+
+<!-- 6. RECOMMENDATIONS -->
+<div class="section" id="rec">
+  <div class="section-header">
+    <span class="section-num">06</span>
+    <h2>Khuyến nghị hành động</h2>
+  </div>
+
+  <p>Sáu khuyến nghị được ưu tiên theo mức độ quan trọng và tính khả thi. Nhóm P1 có thể thực hiện ngay trong vòng một đến bốn tuần. Nhóm P2 cần phối hợp giữa nhiều bộ phận, từ một đến ba tháng. Nhóm P3 là đầu tư dài hạn.</p>
+
+  <div class="rec-item">
+    <div class="rec-badge p1">P1</div>
+    <div>
+      <div class="rec-title">Chuẩn hoá dữ liệu phí nền tảng từ gốc</div>
+      <div class="rec-body">Thiết lập quy tắc kiểm tra tự động: phí nền tảng phải là số dương sau khi nhập vào hệ thống. Nếu phát hiện giá trị âm, pipeline cần cảnh báo ngay thay vì để lọt vào báo cáo. Song song đó, xác nhận lại quy ước xuất dữ liệu với từng platform để tránh xảy ra lại.</div>
+      <div class="rec-meta">
+        <span class="rec-tag">Thời gian: 1 đến 2 tuần</span>
+        <span class="rec-tag">Bộ phận: Data Engineering</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="rec-item">
+    <div class="rec-badge p1">P1</div>
+    <div>
+      <div class="rec-title">Biến phân khúc RFM thành hành động marketing cụ thể</div>
+      <div class="rec-body">Kết nối dữ liệu phân khúc khách hàng với hệ thống CRM để tự động gửi chiến dịch theo nhóm. Khách At Risk nhận ưu đãi đặc biệt trong 48 giờ. Khách New Customer nhận chuỗi email chăm sóc trong 30 ngày đầu. Khách Champion được thông báo sớm về bộ sưu tập mới trước khi ra mắt đại trà. Đây là bước chuyển từ phân tích sang tác động thực tế.</div>
+      <div class="rec-meta">
+        <span class="rec-tag">Thời gian: 2 đến 4 tuần</span>
+        <span class="rec-tag">Bộ phận: Marketing và IT</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="rec-item">
+    <div class="rec-badge p2">P2</div>
+    <div>
+      <div class="rec-title">Đánh giá lại hiệu quả thực sự của từng kênh</div>
+      <div class="rec-body">Tính lợi nhuận ròng thực tế cho từng kênh bằng cách trừ toàn bộ chi phí liên quan: phí nền tảng, hoàn trả, chi phí vận chuyển, ngân sách quảng cáo trên kênh đó. Kết quả có thể thay đổi đáng kể thứ hạng hiệu quả giữa các kênh và định hướng lại quyết định phân bổ ngân sách marketing.</div>
+      <div class="rec-meta">
+        <span class="rec-tag">Thời gian: 1 tháng</span>
+        <span class="rec-tag">Bộ phận: Kinh doanh và Tài chính</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="rec-item">
+    <div class="rec-badge p2">P2</div>
+    <div>
+      <div class="rec-title">Phân tầng cửa hàng theo mức độ trưởng thành</div>
+      <div class="rec-body">Bổ sung thông tin ngày khai trương và phân loại cửa hàng thành ba tầng: Flagship (doanh thu top 20%), Mature (hoạt động trên 12 tháng), New (dưới 6 tháng). Mục tiêu và benchmark AM cần được điều chỉnh theo phân tầng này để đánh giá công bằng hơn và phát hiện đúng cửa hàng cần hỗ trợ.</div>
+      <div class="rec-meta">
+        <span class="rec-tag">Thời gian: 2 đến 3 tháng</span>
+        <span class="rec-tag">Bộ phận: Vận hành và Data</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="rec-item">
+    <div class="rec-badge p3">P3</div>
+    <div>
+      <div class="rec-title">Dự báo doanh thu và phát hiện churn sớm bằng mô hình dự đoán</div>
+      <div class="rec-body">Xây dựng mô hình dự báo doanh thu theo cửa hàng và tháng, có tính đến yếu tố mùa vụ. Bổ sung mô hình dự đoán khách hàng nào có nguy cơ rời bỏ trong 30 ngày tới, thay vì chỉ phát hiện sau khi họ đã rời đi. Đây là bước chuyển từ phân tích mô tả sang phân tích dự đoán.</div>
+      <div class="rec-meta">
+        <span class="rec-tag">Thời gian: 2 đến 3 tháng</span>
+        <span class="rec-tag">Bộ phận: Data Science</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="rec-item">
+    <div class="rec-badge p3">P3</div>
+    <div>
+      <div class="rec-title">Rút ngắn thời gian từ giao dịch đến insight</div>
+      <div class="rec-body">Hiện tại dữ liệu được cập nhật theo lịch định kỳ. Trong các sự kiện Flash Sale kéo dài 4 đến 6 tiếng, dữ liệu 24 giờ là quá chậm để điều chỉnh. Lộ trình nâng cấp: tăng tần suất cập nhật lên mỗi 4 giờ trong giai đoạn đầu, sau đó tiến tới gần thời gian thực cho dữ liệu giao dịch.</div>
+      <div class="rec-meta">
+        <span class="rec-tag">Thời gian: 3 đến 6 tháng</span>
+        <span class="rec-tag">Bộ phận: Data Engineering</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 7. CONCLUSION -->
+<div class="section" id="conclusion">
+  <div class="section-header">
+    <span class="section-num">07</span>
+    <h2>Kết luận</h2>
+  </div>
+
+  <p>Phân tích này bắt đầu bằng 9.4 GB dữ liệu thô từ 5 nguồn khác nhau, với nhiều điểm không nhất quán và thiếu sót. Sau quá trình làm sạch, mô hình hoá và phân tích, những gì còn lại không phải là một tập hợp số liệu đẹp, mà là ba vấn đề cụ thể có thể giải quyết được và sáu hành động có thể bắt đầu ngay.</p>
+
+  <p>Điều quan trọng hơn số liệu là khung tư duy để tiếp cận chúng. Mỗi con số bất thường là một câu hỏi, không phải một kết luận. Phí Tiki âm không có nghĩa là Tiki đang trả tiền cho seller. Khoảng cách target ở cửa hàng mới không có nghĩa là cửa hàng đó kém. Số khách hàng đang tăng không có nghĩa là tệp khách hàng đang khoẻ mạnh. Mỗi trường hợp đều cần được hỏi thêm: tại sao, và từ dữ liệu nào?</p>
+
+  <div class="conclusion-box">
+    <h2>Dữ liệu không tự nói chuyện. Người phân tích phải biết đặt câu hỏi đúng.</h2>
+    <p>Kỹ năng quan trọng nhất không phải là viết truy vấn phức tạp hay vẽ biểu đồ đẹp. Đó là năng lực nhìn vào một con số và hỏi: nó đang kể câu chuyện gì, câu chuyện đó có đúng không, và nếu đúng thì chúng ta nên làm gì? Câu trả lời phải luôn đến từ dữ liệu, không phải từ cảm giác.  </p>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="report-footer">
+  <span>EDW Tech Project · GUMAC/TDA Fashion Retail · Portfolio 2025</span>
+  <span>SQL Server · Power BI · RFM Segmentation · Star Schema</span>
+</div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,15 @@
+# Large data files — không push lên GitHub
+*.bak
+*.pbix
+*.ipynb
+
+# SQL raw data (chỉ giữ views)
+Processing Data.sql
+explore_edw.ipynb
+samples/
+EDW_Tech.bak
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
