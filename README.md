@@ -1,4 +1,4 @@
-# EDW Tech — Business Performance Dashboard
+# EDW Tech -Business Performance Dashboard
 
 > End-to-end BI project: từ 9.4GB SQL Server raw data đến public Power BI dashboard và báo cáo phân tích chuyên sâu.
 
